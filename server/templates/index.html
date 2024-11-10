@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .path-navigator {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            word-wrap: break-word;
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .current-path {
+            color: #4CAF50;
+            font-family: monospace;
+        }
+
+        .hidden-toggle {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hidden-toggle:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .folder-link, .download-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .folder-link {
+            color: #4CAF50;
+        }
+
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .download-btn.folder {
+            background: #2196F3;
+        }
+
+        .folder-link:hover, .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .folder-icon, .file-icon {
+            margin-right: 8px;
+        }
+
+        .hidden-file {
+            opacity: 0.7;
+        }
+
+        .file-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .welcome-text {
+                font-size: 2em;
+            }
+
+            .controls-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .path-navigator {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .table-container {
+                border-radius: 10px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-text {
+                font-size: 1.5em;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div id="loading" class="loading">Creating zip file... Please wait...</div>
+    
+    <div class="container">
+        <div class="welcome-section">
+            <h1 class="welcome-text">Welcome, {{ username }}!</h1>
+        </div>
+
+        <div class="controls-section">
+            <div class="path-navigator">
+                Current path: <span class="current-path">{{ current_path }}</span>
+            </div>
+            <button class="hidden-toggle" onclick="toggleHidden()">
+                {% if show_hidden %}
+                    Hide Hidden Files
+                {% else %}
+                    Show Hidden Files
+                {% endif %}
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in contents %}
+                        <tr class="{% if item.is_hidden %}hidden-file{% endif %}">
+                            <td>
+                                <div class="file-name">
+                                    {% if item.type == 'directory' %}
+                                        <span class="folder-icon">📁</span>
+                                        <a href="?path={{ item.path|urlencode }}&hidden={{ show_hidden|lower }}" 
+                                           class="folder-link">
+                                            {{ item.name }}
+                                        </a>
+                                    {% else %}
+                                        <span class="file-icon">📄</span>
+                                        {{ item.name }}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {{ item.size|filesizeformat }}
+                            </td>
+                            <td>
+                                <a href="{% url 'download_file' %}?filepath={{ item.path|urlencode }}" 
+                                   class="download-btn {% if item.type == 'directory' %}folder{% endif %}"
+                                   onclick="{% if item.type == 'directory' %}showLoading(){% endif %}">
+                                    Download {% if item.type == 'directory' %}(ZIP){% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function toggleHidden() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPath = urlParams.get('path') || '/home';
+            const currentHidden = urlParams.get('hidden') === 'true';
+            window.location.href = `?path=${encodeURIComponent(currentPath)}&hidden=${!currentHidden}`;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: '#4CAF50'
+                },
+                shape: {
+                    type: 'circle'
+                },
+                opacity: {
+                    value: 0.5,
+                    random: false
+                },
+                size: {
+                    value: 3,
+                    random: true
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#4CAF50',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'grab'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+    </script>
+</body>
+</html>
