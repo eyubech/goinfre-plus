@@ -6,6 +6,8 @@ import pwd
 import shutil
 import tempfile
 import datetime
+from django.views.decorators.csrf import csrf_exempt
+
 
 def get_username():
     return os.environ.get('USER') or pwd.getpwuid(os.getuid()).pw_name
@@ -13,6 +15,39 @@ def get_username():
 def get_user_home():
     return os.path.expanduser('~')
 
+def is_path_allowed(path):
+    """Check if the path is within user's home directory"""
+    user_home = get_user_home()
+    real_path = os.path.realpath(path)
+    real_home = os.path.realpath(user_home)
+    return real_path.startswith(real_home)
+
+@csrf_exempt
+def handle_upload(request):
+    if request.method == 'POST':
+        if 'file' in request.FILES:
+            uploaded_file = request.FILES['file']
+            
+            current_path = request.POST.get('path', get_user_home())
+            
+            if not is_path_allowed(current_path):
+                return HttpResponse("Access denied", status=403)
+            
+            try:
+                file_path = os.path.join(current_path, uploaded_file.name)
+                with open(file_path, 'wb') as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+                
+                return HttpResponse("File uploaded successfully", status=200)
+            except Exception as e:
+                print(f"Error uploading file: {e}")
+                return HttpResponse("Error uploading file", status=500)
+        else:
+            return HttpResponse("No file uploaded", status=400)
+    else:
+        return HttpResponse("Method not allowed", status=405)
+        
 def create_zip(path):
     """Create a zip file of a directory."""
     temp_dir = tempfile.gettempdir()
@@ -27,31 +62,19 @@ def create_zip(path):
         print(f"Error creating zip: {e}")
         return None
 
-def is_path_allowed(path):
-    """Check if the path is within user's home directory"""
-    user_home = get_user_home()
-    real_path = os.path.realpath(path)
-    real_home = os.path.realpath(user_home)
-    return real_path.startswith(real_home)
-
 def index(request):
-    # Get user's home directory
     user_home = get_user_home()
     
-    # Get the base path from the request or default to user's home directory
     current_path = request.GET.get('path', user_home)
     show_hidden = request.GET.get('hidden', 'false') == 'true'
     
-    # Security check to prevent directory traversal
     if not is_path_allowed(current_path):
         current_path = user_home
     
-    # Get directory contents
     try:
         items = os.listdir(current_path)
         contents = []
         
-        # Add parent directory if we're not at home
         if current_path != user_home:
             parent_path = os.path.dirname(current_path)
             if is_path_allowed(parent_path):
@@ -63,9 +86,7 @@ def index(request):
                     'is_hidden': False
                 })
         
-        # Add all directories and files
         for item in items:
-            # Skip hidden files if show_hidden is False
             if not show_hidden and item.startswith('.'):
                 continue
                 
@@ -102,7 +123,6 @@ def index(request):
             except (PermissionError, OSError):
                 continue
                 
-        # Sort directories first, then files
         contents.sort(key=lambda x: (x['type'] != 'directory', x['name'].lower()))
         
         context = {
@@ -127,7 +147,6 @@ def download_file(request):
         
     try:
         if os.path.isdir(filepath):
-            # Create zip file for directory
             zip_path = create_zip(filepath)
             if zip_path:
                 response = FileResponse(
@@ -135,7 +154,6 @@ def download_file(request):
                     as_attachment=True,
                     filename=os.path.basename(zip_path)
                 )
-                # Clean up the temporary zip file after sending
                 os.unlink(zip_path)
                 return response
             else:

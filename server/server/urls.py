@@ -22,4 +22,5 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),
     path('download', views.download_file, name='download_file'),
+    path('upload/', views.handle_upload, name='handle_upload'),
 ]

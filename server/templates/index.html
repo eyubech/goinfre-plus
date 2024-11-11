@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Explorer</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48c3R5bGU+LmNsb3Vke2ZpbGw6I2Y1ZjVmNTt9PC9zdHlsZT48L2RlZnM+PHBhdGggY2xhc3M9ImNsb3VkIiBkPSJNMzgxLjUgMjU2YzAtNjYuMjgtNTMuNzItMTIwLTEyMC0xMjBzLTEyMCA1My43Mi0xMjAgMTIwYzAgMTUuMzMgMi45IDI5Ljk4IDguMiA0My41Qzk1LjkgMjc1LjcgNDggMzI1LjQgNDggMzg0YzAgNDQuMiAzNS44IDgwIDgwIDgwaDI2NmM0NC4yIDAgODAtMzUuOCA4MC04MC0uMDEtNTIuNDktNDAuMjUtOTcuOTUtOTIuNS0xMjhBMTI2LjQ5IDEyNi40OSAwIDAgMCAzODEuNSAyNTZ6Ii8+PC9zdmc+">
+    <title>Goinfre +</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
     <style>
         * {
@@ -13,11 +14,35 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --neon-glow: 0 0 10px rgba(255, 255, 255, 0.5),
+                        0 0 20px rgba(255, 255, 255, 0.3),
+                        0 0 30px rgba(255, 255, 255, 0.1);
+            --grid-size: 30px;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a1a;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000000;
             color: #ffffff;
             min-height: 100vh;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(transparent 90%, rgba(255, 255, 255, .1) 90%),
+                linear-gradient(90deg, transparent 90%, rgba(255, 255, 255, .1) 90%);
+            background-size: var(--grid-size) var(--grid-size);
+            z-index: 0;
+            pointer-events: none;
         }
 
         #particles-js {
@@ -34,127 +59,210 @@
             z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .welcome-section {
             text-align: center;
-            padding: 40px 0;
-            margin-bottom: 30px;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title-text {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 800;
+            text-shadow: var(--neon-glow);
+            animation: glitch 5s infinite;
         }
 
         .welcome-text {
-            font-size: 2.5em;
+            font-size: 2em;
             margin-bottom: 10px;
-            color: #4CAF50;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 800;
+            text-shadow: var(--neon-glow);
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            1% { transform: translate(-2px, 2px) }
+            2% { transform: translate(2px, -2px) }
+            3% { transform: translate(0) }
+            100% { transform: translate(0) }
         }
 
         .controls-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            gap: 20px;
         }
 
         .path-navigator {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
             margin-bottom: 20px;
             word-wrap: break-word;
             flex-grow: 1;
-            margin-right: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--neon-glow);
         }
 
         .current-path {
-            color: #4CAF50;
-            font-family: monospace;
+            color: #ffffff;
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
         }
 
         .hidden-toggle {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            position: relative;
+            overflow: hidden;
         }
 
-        .hidden-toggle:hover {
-            background: #45a049;
-            transform: translateY(-2px);
+        .hidden-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .hidden-toggle:hover::before {
+            left: 100%;
         }
 
         .table-container {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 30px;
             overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--neon-glow);
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 8px;
             margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.05);
         }
 
         th, td {
-            padding: 15px;
+            padding: 20px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         th {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
         }
 
-        tr:hover {
+        th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+
+        tr:not(thead tr) {
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        tr:hover:not(thead tr) {
             background: rgba(255, 255, 255, 0.05);
+            transform: translateX(10px);
+            box-shadow: var(--neon-glow);
         }
 
         .folder-link, .download-btn {
             display: inline-block;
-            padding: 8px 15px;
+            padding: 10px 20px;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
 
         .folder-link {
-            color: #4CAF50;
+            color: #ffffff;
         }
 
         .download-btn {
-            background: #4CAF50;
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .download-btn.folder {
-            background: #2196F3;
+        .download-btn::before, .folder-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
         }
 
-        .folder-link:hover, .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        .download-btn:hover::before, .folder-link:hover::before {
+            left: 100%;
         }
 
         .folder-icon, .file-icon {
-            margin-right: 8px;
+            margin-right: 12px;
+            font-size: 1.2em;
         }
 
         .hidden-file {
-            opacity: 0.7;
+            opacity: 0.5;
         }
 
         .file-name {
             display: flex;
             align-items: center;
+            font-weight: 500;
         }
 
         .loading {
@@ -162,53 +270,131 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px 40px;
+            border-radius: 15px;
             display: none;
             z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            box-shadow: var(--neon-glow);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .footer a:hover {
+            text-shadow: var(--neon-glow);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .github-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
+            .container { padding: 20px; }
+            .welcome-text { font-size: 1em; }
+            .title-text { font-size: 2em; }
 
-            .welcome-text {
-                font-size: 2em;
-            }
-
-            .controls-section {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .path-navigator {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-
-            th, td {
-                padding: 10px;
-            }
-
-            .table-container {
-                border-radius: 10px;
-                padding: 10px;
-            }
+            .controls-section { flex-direction: column; }
+            .path-navigator { margin-right: 0; margin-bottom: 15px; }
+            th, td { padding: 15px; }
+            .table-container { padding: 15px; }
         }
 
         @media (max-width: 480px) {
-            .welcome-text {
-                font-size: 1.5em;
+            .welcome-text { font-size: 0.8em; }
+            .title-text { font-size: 1.8em; }
+
+            th, td { padding: 12px; font-size: 0.9em; }
+            .download-btn, .folder-link { padding: 8px 16px; }
+        }
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .upload-button {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--neon-glow);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .upload-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(transparent 90%, rgba(255, 255, 255, 0.1) 90%),
+                linear-gradient(90deg, transparent 90%, rgba(255, 255, 255, 0.1) 90%);
+            background-size: var(--grid-size) var(--grid-size);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .upload-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .upload-button {
+                width: 100px;
+                height: 100px;
             }
 
-            th, td {
-                padding: 8px;
-                font-size: 0.9em;
+            .upload-text {
+                font-size: 14px;
             }
         }
+        
     </style>
 </head>
 <body>
@@ -217,7 +403,16 @@
     
     <div class="container">
         <div class="welcome-section">
-            <h1 class="welcome-text">Welcome, {{ username }}!</h1>
+            <h1 class="title-text">Goinfre Plus</h1>
+            <h1 class="welcome-text">Welcome, {{ username }}</h1>
+            <form action="/upload/" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="upload-container">
+                    <div class="upload-button" onclick="showUploadModal()">
+                        <span class="upload-text">Upload</span>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div class="controls-section">
@@ -274,6 +469,17 @@
                 </tbody>
             </table>
         </div>
+
+        <footer class="footer">
+            <p>Created by 
+                <a href="https://github.com/eyubech" class="github-link" target="_blank" rel="noopener noreferrer">
+                    <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    Ayoub Ech-chetyouy
+                </a>
+            </p>
+        </footer>
     </div>
 
     <script>
@@ -298,34 +504,51 @@
                     }
                 },
                 color: {
-                    value: '#4CAF50'
+                    value: '#ffffff'
                 },
                 shape: {
                     type: 'circle'
                 },
                 opacity: {
-                    value: 0.5,
-                    random: false
+                    value: 0.6,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.3,
+                        sync: false
+                    }
                 },
                 size: {
-                    value: 3,
-                    random: true
+                    value: 4,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 2,
+                        size_min: 1,
+                        sync: false
+                    }
                 },
                 line_linked: {
                     enable: true,
-                    distance: 150,
-                    color: '#4CAF50',
+                    distance: 120,
+                    color: '#ffffff',
                     opacity: 0.4,
                     width: 1
                 },
                 move: {
                     enable: true,
-                    speed: 2,
+                    speed: 1.5,
                     direction: 'none',
-                    random: false,
+                    random: true,
                     straight: false,
                     out_mode: 'out',
-                    bounce: false
+                    bounce: false,
+                    attract: {
+                        enable: true,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
                 }
             },
             interactivity: {
@@ -345,16 +568,92 @@
                     grab: {
                         distance: 140,
                         line_linked: {
-                            opacity: 1
+                            opacity: 0.5
                         }
                     },
                     push: {
-                        particles_nb: 4
+                        particles_nb: 5
                     }
                 }
             },
             retina_detect: true
         });
+
+        document.addEventListener('mousemove', function(e) {
+            const cursor = document.createElement('div');
+            cursor.className = 'cursor-effect';
+            cursor.style.cssText = `
+                position: fixed;
+                pointer-events: none;
+                width: 8px;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: 50%;
+                transform: translate(${e.clientX}px, ${e.clientY}px);
+                transition: transform 0.1s ease;
+                z-index: 9999;
+            `;
+            document.body.appendChild(cursor);
+            
+            setTimeout(() => {
+                cursor.style.opacity = '0';
+                setTimeout(() => {
+                    cursor.remove();
+                }, 200);
+            }, 100);
+        });
+
+
+        document.querySelectorAll('tr:not(thead tr)').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(10px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        const originalText = document.getElementById('loading').innerText;
+        let dots = 0;
+        
+        function updateLoadingDots() {
+            if (document.getElementById('loading').style.display === 'block') {
+                dots = (dots + 1) % 4;
+                document.getElementById('loading').innerText = 
+                    originalText + '.'.repeat(dots);
+            }
+        }
+
+        async function showUploadModal() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.addEventListener('change', async () => {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('path', document.querySelector('.current-path').textContent);
+        
+                try {
+                    const response = await fetch('/upload/', {
+                        method: 'POST',
+                        body: formData
+                    });
+        
+                    if (response.ok) {
+                        alert('File uploaded successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error uploading file: ' + response.status);
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    alert('Error uploading file. Please try again later.');
+                }
+            });
+        
+            fileInput.click();
+        }
+        
+        
     </script>
-</body>
-</html>
