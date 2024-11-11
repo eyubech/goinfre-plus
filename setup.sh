@@ -1,18 +1,20 @@
 #!/bin/bash
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-BOLD='\033[1m'
+export TERM=xterm-256color
+
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+BLUE=$(tput setaf 4)
+PURPLE=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+YELLOW=$(tput setaf 3)
+BOLD=$(tput bold)
+NC=$(tput sgr0)
 
 print_loading() {
     local phrase=$1
-    printf "${CYAN}${BOLD}$phrase${NC}"
+    printf "%s%s%s" "${CYAN}${BOLD}" "$phrase" "${NC}"
     for i in {1..3}; do
-        printf "${YELLOW}.${NC}"
+        printf "%s.%s" "${YELLOW}" "${NC}"
         sleep 0.5
     done
     echo
@@ -20,18 +22,18 @@ print_loading() {
 
 print_success() {
     local text=$1
-    printf "${GREEN}${BOLD}✓ %s${NC}\n" "$text"
+    printf "%s%s✓ %s%s\n" "${GREEN}" "${BOLD}" "$text" "${NC}"
     sleep 0.5
 }
 
 animate_progress() {
     local duration=$1
     local phrase=$2
-    printf "${BLUE}${phrase}${NC} "
+    printf "%s%s%s " "${BLUE}" "${phrase}" "${NC}"
     local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     for (( i=0; i<duration; i++ )); do
         local char="${chars:i%10:1}"
-        printf "${PURPLE}${char}${NC}"
+        printf "%s%s%s" "${PURPLE}" "${char}" "${NC}"
         sleep 0.1
         printf "\b"
     done
@@ -39,15 +41,15 @@ animate_progress() {
 }
 
 print_banner() {
-cat << "EOF"
-${CYAN}
+    echo "${CYAN}${BOLD}"
+    cat << "EOF"
  ____       _        __           ____  _           
 / ___| ___ (_)_ __  / _|_ __ ___ |  _ \| |_   _ ___ 
 | |  _ / _ \| | '_ \| |_| '__/ _ \| |_) | | | | / __|
 | |_| | (_) | | | | |  _| | |  __/|  __/| | |_| \__ \
  \____|\___/|_|_| |_|_| |_|  \___||_|   |_|\__,_|___/
-${NC}
 EOF
+    echo "${NC}"
 }
 
 setup_goinfre_plus() {
@@ -60,10 +62,10 @@ setup_goinfre_plus() {
     mkdir -p "$HOME/.goinfre-plus"
     print_success "Directory created at $HOME/.goinfre-plus"
 
-    print_loading "Moving files to Goinfre Plus directory"
-    mv * "$HOME/.goinfre-plus/" 2>/dev/null || true
+    print_loading "Copying files to Goinfre Plus directory"
+    cp -R ./* "$HOME/.goinfre-plus/" 2>/dev/null || true
     cd "$HOME/.goinfre-plus"
-    print_success "Files moved successfully"
+    print_success "Files copied successfully"
 
     animate_progress 20 "Creating Python virtual environment"
     python3 -m venv env
@@ -81,7 +83,9 @@ setup_goinfre_plus() {
     print_success "Virtual environment deactivated"
 
     print_loading "Setting up Goinfre Plus command"
-    echo 'alias goinfre="python3 ~/.goinfre-plus/start.py"' >> "$HOME/.zshrc"
+    if ! grep -q "alias goinfre=" "$HOME/.zshrc"; then
+        echo 'alias goinfre="python3 ~/.goinfre-plus/start.py"' >> "$HOME/.zshrc"
+    fi
     print_success "Alias added to .zshrc"
 
     echo
